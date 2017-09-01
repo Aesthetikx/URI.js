@@ -632,7 +632,7 @@
     var items = {};
     var splits = string.split('&');
     var length = splits.length;
-    var v, name, value;
+    var v, name, value, key;
 
     for (var i = 0; i < length; i++) {
       v = splits[i].split('=');
@@ -640,15 +640,34 @@
       // no "=" is null according to http://dvcs.w3.org/hg/url/raw-file/tip/Overview.html#collect-url-parameters
       value = v.length ? URI.decodeQuery(v.join('='), escapeQuerySpace) : null;
 
-      if (hasOwn.call(items, name)) {
-        if (typeof items[name] === 'string' || items[name] === null) {
-          items[name] = [items[name]];
-        }
+      var regex = /(\w+)\[(\w+)\]/g;
+      var matches = regex.exec(name);
 
-        items[name].push(value);
-      } else {
-        items[name] = value;
+      if (matches && matches.length > 1) {
+        name = matches[1];
+        key = matches[2];
       }
+
+      if (hasOwn.call(items, name)) {
+        if (key) {
+          items[name][key] = value;
+        } else {
+          if (typeof items[name] === 'string' || items[name] === null) {
+            items[name] = [items[name]];
+          }
+
+          items[name].push(value);
+        }
+      } else {
+        if (key) {
+          items[name] = {};
+          items[name][key] = value;
+        } else {
+          items[name] = value;
+        }
+      }
+
+      key = null;
     }
 
     return items;

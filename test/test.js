@@ -351,6 +351,10 @@
     equal(u.query(), 'foo&foo=bar', 'search: foo&foo=bar');
     equal(JSON.stringify(u.query(true)), JSON.stringify({foo: [null, 'bar']}), 'parsed query: {foo:[null, "bar"]}');
 
+    u.search('foo[bar]=baz&foo[qux]=qaz');
+    equal(u.query(), 'foo[bar]=baz&foo[qux]=qaz', 'search: foo[bar]=baz&foo[qux]=qaz');
+    equal(JSON.stringify(u.query(true)), JSON.stringify({foo: { bar: 'baz', qux: 'qaz' }}), 'parsed query: {foo:{bar: "baz", qux:"qaz"}}');
+
     // parsing empty query
     var t;
     t = u.query('?').query(true);
